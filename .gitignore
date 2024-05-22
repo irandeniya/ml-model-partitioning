@@ -1,0 +1,6 @@
+/aclImdb*
+/glove.6B/glove.6B*
+/glove.6B.zip
+*.pdf
+*.pptx
+*.pth
