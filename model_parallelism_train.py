@@ -72,7 +72,7 @@ def collate_fn(batch):
     return padded_sequences, torch.tensor(labels)
 
 # Data Preparation
-data_dir = "aclImdb"  # Update with your path
+data_dir = "aclImdb"
 dataset = IMDBDataset(data_dir, "train")
 
 # Split the training dataset into two partitions

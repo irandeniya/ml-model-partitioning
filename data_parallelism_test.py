@@ -81,11 +81,9 @@ dataset = IMDBDataset(data_dir, "train")
 model1 = SimpleClassifier(len(dataset.vocab), 100, 128, 2).to(device)
 model2 = SimpleClassifier(len(dataset.vocab), 100, 128, 2).to(device)
 
-# Load Saved Models
 model1.load_state_dict(torch.load("data-parallelism-model1.pth"))
 model2.load_state_dict(torch.load("data-parallelism-model2.pth"))
 
-# Choose Model for Testing (e.g., model1)
 test_model1 = model1
 test_model1.eval()
 
@@ -106,7 +104,6 @@ def predict_sentiment_split_aggregate(text, models, vocab, device):
             output = model(processed_sentence)
             model_outputs.append(output)
 
-    # Aggregate probabilities using a simple average (you can experiment with weighted average)
     probabilities = [F.softmax(output, dim=1) for output in model_outputs]
     confidences = [torch.max(F.softmax(output, dim=1), dim=1)[0] for output in model_outputs]
     weights = F.softmax(torch.tensor(confidences), dim=0)
@@ -116,7 +113,6 @@ def predict_sentiment_split_aggregate(text, models, vocab, device):
     return "Positive" if predicted_label == 1 else "Negative"
 
 
-# Example Usage
 test_texts = [
     "This movie is a masterpiece! The acting was superb.",
     "I really enjoyed this film. Truly captivating.",
@@ -129,3 +125,4 @@ aggregated_sentiments = [predict_sentiment_split_aggregate(text, [test_model1, t
 
 for text, sentiment in zip(test_texts, aggregated_sentiments):
     print(f"'{text}' - Aggregated Sentiment: {sentiment}")
+

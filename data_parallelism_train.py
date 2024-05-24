@@ -72,7 +72,7 @@ def collate_fn(batch):
     return padded_sequences, torch.tensor(labels)
 
 # Data Preparation
-data_dir = "aclImdb"  # Update with your path
+data_dir = "aclImdb"
 dataset = IMDBDataset(data_dir, "train")
 train_size = int(0.8 * len(dataset))
 test_size = len(dataset) - train_size

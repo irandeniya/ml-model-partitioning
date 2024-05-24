@@ -119,25 +119,26 @@ batch_size = 64
 num_epochs = 5  # Adjust as needed
 learning_rate = 0.001
 
-data_dir = "aclImdb"  # Update with your path
+data_dir = "aclImdb"
 dataset = IMDBDataset(data_dir, "train", word_to_index=word_to_index, vectors=vectors)
 train_size = int(0.8 * len(dataset))
 test_size = len(dataset) - train_size
 train_dataset, test_dataset = random_split(dataset, [train_size, test_size])
 
 # DataLoaders
-train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, collate_fn=collate_fn)  # Add collate_fn
+train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, collate_fn=collate_fn)
 test_dataloader = DataLoader(test_dataset, batch_size=batch_size, collate_fn=collate_fn)
 
 # Model Initialization & Training
 vocab_size = len(word_to_index) 
 embed_dim = 100
 hidden_dim = 256
-num_layers = 5  # 5 layers as per your requirement
+num_layers = 5
 output_dim = 1
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-model = SentimentClassifier(vocab_size, embed_dim, hidden_dim, num_layers, output_dim, word_to_index=word_to_index, vectors=vectors, device = device)
+model = SentimentClassifier(vocab_size, embed_dim, hidden_dim, num_layers, output_dim, word_to_index=word_to_index, 
+                            vectors=vectors, device = device)
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 criterion = nn.BCEWithLogitsLoss()
 
@@ -191,11 +192,11 @@ with torch.no_grad():
 
 
 
-def predict_sentiment(model_part1, model_part2, texts, vocab, max_len=256):   
+def predict_sentiment(model_part1, model_part2, texts, word_to_index, max_len=256):   
     # Tokenize input texts
     tokenized_texts = []
     for text in texts:
-        token_ids = [vocab.get(token, vocab["<unk>"]) for token in text.split()][:max_len]
+        token_ids = [word_to_index.get(token, word_to_index["<unk>"]) for token in text.split()][:max_len]
         padding_length = max_len - len(token_ids)
         token_ids += [0] * padding_length
         tokenized_texts.append(torch.tensor(token_ids))
@@ -203,9 +204,6 @@ def predict_sentiment(model_part1, model_part2, texts, vocab, max_len=256):
     # Create a DataLoader (single batch for efficiency)
     test_dataloader = DataLoader(tokenized_texts, batch_size=len(tokenized_texts))
 
-    # Get predictions
-    model_part1.eval()
-    model_part2.eval()
     with torch.no_grad():
         for inputs in test_dataloader:  # Single batch iteration
             inputs = inputs.to(device)
@@ -223,9 +221,7 @@ test_texts = [
     "The acting was terrible. The special effects were laughable."
 ]
 
-
-# Make predictions on your test texts
-predictions = predict_sentiment(model_part1, model_part2, test_texts, dataset.vocab)
+predictions = predict_sentiment(model_part1, model_part2, test_texts, word_to_index)
 
 # Print results with original texts
 for text, sentiment in zip(test_texts, predictions):

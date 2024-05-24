@@ -73,15 +73,12 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 data_dir = "aclImdb"  # Update with your path
 dataset = IMDBDataset(data_dir, "train")
 
-# Create the model instances FIRST
 model1 = SimpleClassifier(len(dataset.vocab), 100, 128, 2).to(device)
 model2 = SimpleClassifier(len(dataset.vocab), 100, 128, 2).to(device)
 
-# Load Saved Models
 model1.load_state_dict(torch.load("model-parallelism-model1.pth"))
 model2.load_state_dict(torch.load("model-parallelism-model2.pth"))
 
-# Choose Model for Testing (e.g., model1)
 test_model1 = model1
 test_model1.eval()
 
@@ -113,8 +110,10 @@ test_texts = [
     "The acting was terrible."
 ]
 
-aggregated_sentiments = aggregate_sentiment_with_probabilities(test_texts, [test_model1, test_model2], dataset.vocab, device)
+aggregated_sentiments = aggregate_sentiment_with_probabilities(test_texts, [test_model1, test_model2], 
+                                                               dataset.vocab, device)
 
 for text, sentiment in zip(test_texts, aggregated_sentiments):
     print(f"'{text}' - Aggregated Sentiment: {sentiment}")
+
 
